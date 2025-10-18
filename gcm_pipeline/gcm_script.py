@@ -163,9 +163,36 @@ def _exit_and_cleanup_scratch(output_dir, output_file, initial_working_dir, scra
         scratch_directory (str): The scratch directory used for temporary work.
         formatted_file (str): The formatted file containing the results.
     """
+    # result_filename = f'partition_{os.path.basename(formatted_file)}'
+    # output_filepath = os.path.join(output_dir, output_file)
+    # result_filepath = os.path.join(scratch_directory, result_filename)
+
+    # # Copy result file to output directory
+    # if os.path.exists(result_filepath):
+    #     shutil.copy(result_filepath, output_filepath)
+    # else:
+    #     print("Error encountered, no result exists")
+
+    # # Restore the original working directory and clean up the scratch directory
+    # os.chdir(initial_working_dir)
+    # if os.path.exists(scratch_directory):
+    #     shutil.rmtree(scratch_directory)
+    """
+    Cleanup the scratch directory and move the output to the designated directory. Copilot's fix because there were problems with findings the results folder and saving the results.
+    """
     result_filename = f'partition_{os.path.basename(formatted_file)}'
-    output_filepath = os.path.join(output_dir, output_file)
     result_filepath = os.path.join(scratch_directory, result_filename)
+
+    # Ensure output_dir is resolved relative to the original working directory
+    if output_dir is None:
+        output_dir = initial_working_dir
+    output_dir_abs = output_dir if os.path.isabs(output_dir) else os.path.join(initial_working_dir, output_dir)
+    output_dir_abs = os.path.abspath(output_dir_abs)
+
+    # Ensure destination directory exists
+    os.makedirs(output_dir_abs, exist_ok=True)
+
+    output_filepath = os.path.join(output_dir_abs, output_file)
 
     # Copy result file to output directory
     if os.path.exists(result_filepath):
